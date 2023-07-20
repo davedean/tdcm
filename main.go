@@ -66,7 +66,7 @@ func actionHandler(w http.ResponseWriter, r *http.Request) {
 func tmplServer(w http.ResponseWriter, r *http.Request) {
 
 	pageData := PageData{
-		PageTitle: "Tiny Docker Page",
+		PageTitle: "Tiny Docker Container Manager",
 	}
 
 	cli, err := client.NewClientWithOpts(client.FromEnv)
