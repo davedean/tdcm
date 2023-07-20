@@ -1,4 +1,4 @@
-FROM golang:latest as base
+FROM golang:alpine as base
 
 FROM base as dev
 
