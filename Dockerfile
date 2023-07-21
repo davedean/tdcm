@@ -19,5 +19,6 @@ FROM alpine:latest as run
 WORKDIR /opt/app/
 COPY --from=dev /build/main /opt/app/main
 COPY ./layout.html /opt/app/layout.html
+COPY ./colour-modes.js /opt/app/colour-modes.js
 
 CMD ["/opt/app/main"]
