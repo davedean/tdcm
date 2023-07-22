@@ -2,23 +2,19 @@ package main
 
 import (
 	"context"
-	"fmt"
-	"html/template"
 	"log"
 	"net/http"
 	"os"
-	"strings"
 
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/client"
-	"golang.org/x/crypto/bcrypt"
-
-	auth "github.com/abbot/go-http-auth"
+	"github.com/gin-gonic/contrib/static"
+	"github.com/gin-gonic/gin"
 )
 
 const (
-	version = "0.001"
+	version = "0.002"
 	port    = ":8089"
 )
 
@@ -26,112 +22,129 @@ const (
 var authUser string = os.Getenv("USER")
 var authPass string = os.Getenv("PASS")
 
-type ContainerData struct {
-	ID     string
-	Name   string
-	State  string
-	Status string
+type Container struct {
+	ID     string `json:"id"`
+	Name   string `json:"name"`
+	Image  string `json:"image"`
+	State  string `json:"state"`
+	Status string `json:"status"`
 }
 
 type PageData struct {
 	PageTitle  string
-	Containers []ContainerData
+	Containers []Container
 }
 
-func Secret(user, realm string) string {
-	if user == authUser {
-		hashedPassword, err := bcrypt.GenerateFromPassword([]byte(authPass), bcrypt.DefaultCost)
-		if err == nil {
-			return string(hashedPassword)
-		}
+func (c Container) Action(action string) string {
+	cli, err := client.NewClientWithOpts(client.FromEnv)
+	if err != nil {
+		log.Println("no new client")
+		panic(err)
+	}
+
+	log.Println("action is ", action)
+	switch action {
+	case "stop":
+		_ = cli.ContainerStop(context.Background(), c.ID, container.StopOptions{})
+	case "start":
+		_ = cli.ContainerStart(context.Background(), c.ID, types.ContainerStartOptions{})
+	case "remove":
+		_ = cli.ContainerRemove(context.Background(), c.ID, types.ContainerRemoveOptions{})
 	}
 	return ""
 }
 
-func handle(w http.ResponseWriter, r *auth.AuthenticatedRequest) {
-	fmt.Fprintf(w, "<html><body><h1>Hello, %s!</h1></body></html>", r.Username)
+func basicAuth(c *gin.Context) {
+	// Get the Basic Authentication credentials
+	user, password, hasAuth := c.Request.BasicAuth()
+	if hasAuth && user == authUser && password == authPass {
+		log.Println("Authenticated user:", user)
+	} else {
+		c.AbortWithStatus(http.StatusForbidden)
+		c.Writer.Header().Set("WWW-Authenticate", "Basic realm=Restricted")
+		return
+	}
 }
 
 func main() {
 
-	authenticator := auth.NewBasicAuthenticator("example.com", Secret)
+	router := gin.Default()
+	router.SetTrustedProxies(nil) // stop gin complaining
 
-	// Handlers
-	http.HandleFunc("/", authenticator.Wrap(tmplServer))
-	http.HandleFunc("/stop", authenticator.Wrap(actionHandler))
-	http.HandleFunc("/start", authenticator.Wrap(actionHandler))
-	http.HandleFunc("/rm", authenticator.Wrap(actionHandler))
+	// Ping test
+	router.GET("/ping", func(c *gin.Context) {
+		c.String(http.StatusOK, `{ "message": "pong" }`)
+	})
 
-	// start up
+	router.Use(static.Serve("/", static.LocalFile("./assets", true))) // static files, no auth
+
+	// Setup route group for the API
+	api := router.Group("/api")
+	{
+		api.GET("/", basicAuth) // basicAuth for api calls
+	}
+	api.GET("/containers", basicAuth, ContainerHandler)
+	api.POST("/containers/:action/:containerID", basicAuth, ActionContainer)
+
+	// Start and run the server
 	log.Printf("Starting version v%s on port %s", version, port)
-	http.ListenAndServe(port, nil)
+	router.Run(port)
+
 }
 
-func actionHandler(w http.ResponseWriter, r *auth.AuthenticatedRequest) {
-	log.Printf("URL: %s", r.URL)
-
-	id := strings.Split(r.URL.String(), "=")[1]
-	action := strings.Split(r.URL.String(), "?")[0]
-
+func getContainers() (containers []Container) {
 	cli, err := client.NewClientWithOpts(client.FromEnv)
 	if err != nil {
 		panic(err)
 	}
-
-	switch action {
-	case "/stop":
-		_ = cli.ContainerStop(context.Background(), id, container.StopOptions{})
-	case "/start":
-		_ = cli.ContainerStart(context.Background(), id, types.ContainerStartOptions{})
-	case "/rm":
-		_ = cli.ContainerRemove(context.Background(), id, types.ContainerRemoveOptions{})
+	containerList, err := cli.ContainerList(context.Background(), types.ContainerListOptions{All: true})
+	if err != nil {
+		panic(err)
 	}
 
-	// TODO, this doesn't display what it's stopping
-	tmpl := template.Must(template.New("tpl").Parse("<html><head><meta http-equiv='refresh' content='1 url=/'></head><body>Applying.. {{.id}}</body>"))
-	tmpl.Execute(w, "")
+	for index := range containerList {
+		var newContainer Container = Container{
+			ID:     containerList[index].ID,
+			Name:   containerList[index].Names[0][1:],
+			Image:  containerList[index].Image,
+			State:  containerList[index].State,
+			Status: containerList[index].Status,
+		}
+		containers = append(containers, newContainer)
+	}
+
+	log.Println(containers)
+	return containers
 }
 
-func tmplServer(w http.ResponseWriter, r *auth.AuthenticatedRequest) {
+func ContainerHandler(c *gin.Context) {
+	containers := getContainers()
 
-	pageData := PageData{
-		PageTitle: "Tiny Docker Container Manager",
-	}
+	c.Header("Content-Type", "application/json")
+	c.JSON(http.StatusOK, containers)
+}
 
-	cli, err := client.NewClientWithOpts(client.FromEnv)
-	if err != nil {
-		panic(err)
-	}
+func ActionContainer(c *gin.Context) {
+	containerid := c.Param("containerID")
+	containeridLength := len(containerid)
+	action := c.Param("action")
 
-	containers, err := cli.ContainerList(context.Background(), types.ContainerListOptions{All: true})
-	if err != nil {
-		panic(err)
-	}
+	containers := getContainers()
 
-	var runningContainers, stoppedContainers []ContainerData
-
-	for _, container := range containers {
-		fmt.Printf("%s %s %s\n", container.ID[:10], container.Image, container.Status)
-		if len(container.Image) > 33 {
-			container.Image = container.Image[:32]
-		}
-		newContainerData := ContainerData{container.ID[:10], container.Image, container.State, container.Status}
-
-		switch container.State {
-		case "running":
-			runningContainers = append(runningContainers, newContainerData)
-		default:
-			stoppedContainers = append(stoppedContainers, newContainerData)
+	match := false
+	for i := 0; i < len(containers); i++ {
+		if containers[i].ID[:containeridLength] == containerid {
+			containers[i].Action(action)
+			match = true
 		}
 	}
-	pageData.Containers = append(pageData.Containers, runningContainers...)
-	pageData.Containers = append(pageData.Containers, stoppedContainers...)
 
-	// template is in own file
-	tmpl, newerr := template.ParseFiles("layout.html")
-	if newerr != nil {
-		log.Println("template no bueno", newerr)
+	if match {
+		// update the container list, maybe pointless
+		containers = getContainers()
+		c.JSON(http.StatusOK, &containers)
+	} else {
+		// this only happens if theres no match
+		c.AbortWithStatus(http.StatusNotFound)
 	}
-
-	tmpl.Execute(w, pageData)
 }
