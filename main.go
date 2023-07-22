@@ -59,7 +59,7 @@ func basicAuth(c *gin.Context) {
 	if hasAuth && user == authUser && password == authPass {
 		log.Println("Authenticated user:", user)
 	} else {
-		c.Abort()
+		c.AbortWithStatus(http.StatusForbidden)
 		c.Writer.Header().Set("WWW-Authenticate", "Basic realm=Restricted")
 		return
 	}
@@ -68,24 +68,19 @@ func basicAuth(c *gin.Context) {
 func main() {
 
 	router := gin.Default()
-	router.SetTrustedProxies(nil)                                               // stop gin complaining
-	router.Use(static.Serve("/", static.LocalFile("./views", true)), basicAuth) // static files
+	router.SetTrustedProxies(nil) // stop gin complaining
 
-	authorized := router.Group("/admin", gin.BasicAuth(gin.Accounts{
-		authUser: authPass,
-	}))
+	// Ping test
+	router.GET("/ping", func(c *gin.Context) {
+		c.String(http.StatusOK, "pong")
+	})
 
-	authorized.Use(static.Serve("/", static.LocalFile("./views", true)), basicAuth) // static files
+	router.Use(static.Serve("/", static.LocalFile("./views", true))) // static files, no auth
 
 	// Setup route group for the API
 	api := router.Group("/api")
 	{
-		api.GET("/", func(c *gin.Context) {
-			c.JSON(http.StatusOK, gin.H{
-				"message": "pong",
-			})
-		}, gin.BasicAuth(gin.Accounts{
-			authUser: authPass}))
+		api.GET("/", basicAuth) // basicAuth for api calls
 	}
 	api.GET("/containers", basicAuth, ContainerHandler)
 	api.POST("/containers/:action/:containerID", basicAuth, ActionContainer)
