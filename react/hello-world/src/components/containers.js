@@ -51,18 +51,17 @@ const ContainerTable = () => {
         <table class="table table-striped">
           <thead class="thead-dark">
             <tr>
-              <th>ID</th>
+              <th>Name</th>
               <th>Image</th>
-              <th>State</th>
               <th>Status</th>
+              <th>Controls</th>
             </tr>
           </thead>
           <tbody>
             {containers.map((container) => (
               <tr key={container.id}>
-                <td>{container.id}</td>
+                <td>{container.name}</td>
                 <td>{container.image}</td>
-                <td>{container.state}</td>
                 <td>{container.status}</td>
                 <td>
                 <button 
@@ -70,7 +69,7 @@ const ContainerTable = () => {
   onClick={() => handleAction('start', container.id)}
   disabled={processingContainer === container.id || container.state === 'running'}
 >
-  {processingContainer === container.id && action === 'start' ? 'Processing...' : 'Start'}
+  {processingContainer === container.id && action === 'start' ? '...' : 'Start'}
 </button>
 </td>
 <td>
@@ -79,7 +78,7 @@ const ContainerTable = () => {
   onClick={() => handleAction('stop', container.id)}
   disabled={processingContainer === container.id || container.state !== 'running'}
 >
-  {processingContainer === container.id && action === 'stop' ? 'Processing...' : 'Stop'}
+  {processingContainer === container.id && action === 'stop' ? '...' : 'Stop'}
 </button>
 </td>
 <td>
@@ -88,7 +87,7 @@ const ContainerTable = () => {
   onClick={() => handleAction('remove', container.id)}
   disabled={processingContainer === container.id || container.state === 'running'}
 >
-  {processingContainer === container.id && action === 'remove' ? 'Processing...' : 'Remove'}
+  {processingContainer === container.id && action === 'remove' ? '...' : 'rm'}
 </button>
                 </td>
               </tr>
