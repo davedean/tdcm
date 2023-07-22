@@ -6,12 +6,25 @@ import (
 	"html/template"
 	"log"
 	"net/http"
+	"os"
 	"strings"
 
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/client"
+	"golang.org/x/crypto/bcrypt"
+
+	auth "github.com/abbot/go-http-auth"
 )
+
+const (
+	version = "0.001"
+	port    = ":8089"
+)
+
+// Auth creds
+var authUser string = os.Getenv("USER")
+var authPass string = os.Getenv("PASS")
 
 type ContainerData struct {
 	ID     string
@@ -39,9 +52,37 @@ func main() {
 	// start up
 	log.Println("Starting on :8089")
 	http.ListenAndServe(":8089", nil)
+	
+func Secret(user, realm string) string {
+	if user == authUser {
+		hashedPassword, err := bcrypt.GenerateFromPassword([]byte(authPass), bcrypt.DefaultCost)
+		if err == nil {
+			return string(hashedPassword)
+		}
+	}
+	return ""
 }
 
-func actionHandler(w http.ResponseWriter, r *http.Request) {
+func handle(w http.ResponseWriter, r *auth.AuthenticatedRequest) {
+	fmt.Fprintf(w, "<html><body><h1>Hello, %s!</h1></body></html>", r.Username)
+}
+
+func main() {
+
+	authenticator := auth.NewBasicAuthenticator("example.com", Secret)
+
+	// Handlers
+	http.HandleFunc("/", authenticator.Wrap(tmplServer))
+	http.HandleFunc("/stop", authenticator.Wrap(actionHandler))
+	http.HandleFunc("/start", authenticator.Wrap(actionHandler))
+	http.HandleFunc("/rm", authenticator.Wrap(actionHandler))
+
+	// start up
+	log.Printf("Starting version v%s on port %s", version, port)
+	http.ListenAndServe(port, nil)
+}
+
+func actionHandler(w http.ResponseWriter, r *auth.AuthenticatedRequest) {
 	log.Printf("URL: %s", r.URL)
 
 	id := strings.Split(r.URL.String(), "=")[1]
@@ -66,7 +107,7 @@ func actionHandler(w http.ResponseWriter, r *http.Request) {
 	tmpl.Execute(w, "")
 }
 
-func tmplServer(w http.ResponseWriter, r *http.Request) {
+func tmplServer(w http.ResponseWriter, r *auth.AuthenticatedRequest) {
 
 	pageData := PageData{
 		PageTitle: "Tiny Docker Container Manager",
