@@ -8,6 +8,7 @@ COPY react/hello-world/package.json /build/package.json
 COPY react/hello-world/package-lock.json /build/package-lock.json
 # the [s] is a hack, so node_modules is only copied if it exists 
 COPY react/hello-world/node_module[s] /build/node_modules
+
 RUN npm install
 
 COPY react/hello-world/public /build/public
