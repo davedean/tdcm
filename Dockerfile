@@ -3,10 +3,14 @@ FROM node:19.8.1-alpine3.17 AS frontendbuild
 
 WORKDIR /build
 
-COPY react /build/react
-
-WORKDIR /build/react/hello-world/
+# easily cached layer first
+COPY react/hello-world/package.json /build/package.json
+COPY react/hello-world/package-lock.json /build/package-lock.json
+COPY react/hello-world/node_modules /build/node_modules
 RUN npm install
+
+COPY react/hello-world/public /build/public
+COPY react/hello-world/src /build/src
 RUN npm run build
 
 ################## build back end
@@ -28,7 +32,7 @@ RUN go build main.go
 ######## assemble runtime
 FROM alpine:latest as run
 WORKDIR /app
-COPY --from=frontendbuild /build/react/hello-world/build /app/assets
+COPY --from=frontendbuild /build/build /app/assets
 COPY --from=backendbuild /build/main /app/main
 
 # dont think I need this?
