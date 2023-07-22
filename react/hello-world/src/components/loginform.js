@@ -27,18 +27,32 @@ function LoginForm({ onLogin }) {
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <label>
-        Username:
-        <input type="text" value={username} onChange={e => setUsername(e.target.value)} />
-      </label>
-      <label>
-        Password:
-        <input type="password" value={password} onChange={e => setPassword(e.target.value)} />
-      </label>
-      <input type="submit" value="Log In" />
-    </form>
-  );
+    <div className="d-flex justify-content-center">
+    <form onSubmit={handleSubmit} className="p-3" style={{maxWidth: '400px'}}>
+          <div className="form-group">
+            <label htmlFor="username">Username:</label>
+            <input 
+              type="text" 
+              id="username"
+              value={username} 
+              onChange={e => setUsername(e.target.value)} 
+              className="form-control"
+            />
+          </div>
+          <div className="form-group">
+            <label htmlFor="password">Password:</label>
+            <input 
+              type="password" 
+              id="password"
+              value={password} 
+              onChange={e => setPassword(e.target.value)} 
+              className="form-control"
+            />
+          </div>
+          <button type="submit" className="btn btn-primary">Log In</button>
+        </form>
+        </div>
+      );
 }
 
 export default App;
