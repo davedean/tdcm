@@ -39,21 +39,6 @@ type PageData struct {
 	Containers []ContainerData
 }
 
-func main() {
-
-	// Handlers
-	http.HandleFunc("/", tmplServer)
-	http.HandleFunc("/stop", actionHandler)
-	http.HandleFunc("/start", actionHandler)
-	http.HandleFunc("/rm", actionHandler)
-	http.Handle("/tmpfiles/",
-    http.StripPrefix("/tmpfiles/", http.FileServer(http.Dir("/opt/app"))))
-
-	// start up
-	log.Println("Starting on :8089")
-	http.ListenAndServe(":8089", nil)
-}
-	
 func Secret(user, realm string) string {
 	if user == authUser {
 		hashedPassword, err := bcrypt.GenerateFromPassword([]byte(authPass), bcrypt.DefaultCost)
@@ -77,6 +62,8 @@ func main() {
 	http.HandleFunc("/stop", authenticator.Wrap(actionHandler))
 	http.HandleFunc("/start", authenticator.Wrap(actionHandler))
 	http.HandleFunc("/rm", authenticator.Wrap(actionHandler))
+	http.Handle("/tmpfiles/",
+    http.StripPrefix("/tmpfiles/", http.FileServer(http.Dir("/opt/app"))))
 
 	// start up
 	log.Printf("Starting version v%s on port %s", version, port)
