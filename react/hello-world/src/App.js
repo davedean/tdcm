@@ -1,23 +1,6 @@
 import logo from './logo.svg';
 import './App.css';
 
-/*
-const Ping = () => { useEffect(() => {
-  const [posts, setPosts] = useState([]);
-
-  fetch('http://localhost:8089/ping=10')
-     .then((response) => response.json())
-     .then((data) => {
-        console.log(data);
-        setPosts(data);
-     })
-     .catch((err) => {
-        console.log(err.message);
-     });
-}, []);
-}
-*/
-
 function App() {
   return (
     <div className="App">
