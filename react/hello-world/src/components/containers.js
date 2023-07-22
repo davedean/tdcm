@@ -8,10 +8,13 @@ const ContainerTable = () => {
   const [action, setAction] = useState(null);
 
 
+  axios.defaults.baseURL = `${window.location.protocol}//${window.location.host}/api`;
+
+
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get('http://localhost:8089/api/containers');
+        const response = await axios.get('/containers');
         setContainers(response.data);
         setIsLoading(false);
       } catch (error) {
@@ -30,8 +33,8 @@ const ContainerTable = () => {
     setProcessingContainer(id);
     setAction(action);
     try {
-      await axios.post(`/api/containers/${action}/${id}`);
-      const response = await axios.get('/api/containers');
+      await axios.post(`/containers/${action}/${id}`);
+      const response = await axios.get('/containers');
       setContainers(response.data);
     } catch (error) {
       console.error(`Error trying to ${action} container with id ${id}`, error);
