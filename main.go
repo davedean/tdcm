@@ -25,6 +25,7 @@ var authPass string = os.Getenv("PASS")
 type Container struct {
 	ID     string `json:"id"`
 	Name   string `json:"name"`
+	Image  string `json:"image"`
 	State  string `json:"state"`
 	Status string `json:"status"`
 }
@@ -104,7 +105,8 @@ func getContainers() (containers []Container) {
 	for index := range containerList {
 		var newContainer Container = Container{
 			ID:     containerList[index].ID,
-			Name:   containerList[index].Image,
+			Name:   containerList[index].Names[0][1:],
+			Image:  containerList[index].Image,
 			State:  containerList[index].State,
 			Status: containerList[index].Status,
 		}
