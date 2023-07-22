@@ -102,6 +102,7 @@ func getContainers() (containers []Container) {
 		panic(err)
 	}
 
+	var runningContainers, otherContainers []Container
 	for index := range containerList {
 		var newContainer Container = Container{
 			ID:     containerList[index].ID,
@@ -110,10 +111,16 @@ func getContainers() (containers []Container) {
 			State:  containerList[index].State,
 			Status: containerList[index].Status,
 		}
-		if containerList[index].Image[1:6] == "sha256" {
+		if len(containerList[index].Image) > 20 {
 			newContainer.Image = containerList[index].Image[1:16] + "..."
 		}
-		containers = append(containers, newContainer)
+
+		if newContainer.State == "running" {
+			runningContainers = append(runningContainers, newContainer)
+		} else {
+			otherContainers = append(otherContainers, newContainer)
+		}
+		containers = append(runningContainers, otherContainers...)
 	}
 
 	log.Println(containers)
