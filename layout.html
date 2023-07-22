@@ -6,7 +6,8 @@
     <title>tdcm</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
     <link rel="stylesheet" href="styles.css">
-    <script type="text/javascript" src="colour-modes.js"></script>
+    <link rel="icon" type="image/svg" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2216%22%20height%3D%2216%22%20fill%3D%22currentColor%22%20class%3D%22bi%20bi-box-seam%22%20viewBox%3D%220%200%2016%2016%22%3E%20%3Cpath%20d%3D%22M8.186%201.113a.5.5%200%200%200-.372%200L1.846%203.5l2.404.961L10.404%202l-2.218-.887zm3.564%201.426L5.596%205%208%205.961%2014.154%203.5l-2.404-.961zm3.25%201.7-6.5%202.6v7.922l6.5-2.6V4.24zM7.5%2014.762V6.838L1%204.239v7.923l6.5%202.6zM7.443.184a1.5%201.5%200%200%201%201.114%200l7.129%202.852A.5.5%200%200%201%2016%203.5v8.662a1%201%200%200%201-.629.928l-7.185%202.874a.5.5%200%200%201-.372%200L.63%2013.09a1%201%200%200%201-.63-.928V3.5a.5.5%200%200%201%20.314-.464L7.443.184z%22%2F%3E%20%3C%2Fsvg%3E">
+    <script src="/tmpfiles/colour-modes.js"></script>
   </head>
   <body>
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
@@ -65,17 +66,19 @@
        <table class="table table-striped">
                <thead class="thead-dark">
                        <tr>
-                               <th scope="col">ID</th>
                                <th scope="col">Name</th>
+                               <th scope="col">Image</th>
                                <th scope="col">State</th>
                                <th scope="col">Status</th>
+                               <th scope="col"></th>
+                               <th scope="col"></th>
                        </tr>
                </thead>
                <tbody>
                        {{range .Containers}}
                        <tr>
-                               <td>{{.ID}}</td>
-                               <td>{{.Name}}</td>
+                               <td>{{.Names}}</td>
+                               <td>{{.Image}}</td>
                                <td>{{.Status}}</td>
                                <td><a href="/start?id={{.ID}}" class="btn btn-success">start</a></td>
                                <td><a href="/stop?id={{.ID}}" class="btn btn-primary">stop</a></td>
@@ -104,4 +107,13 @@
       </symbol>
     </svg>
   </body>
+  <style>
+    symbol {
+      fill: grey;
+    }
+    .bi {
+      width:1em;
+      height:1em;
+    }
+  </style>
 </html>

@@ -15,7 +15,8 @@ import (
 
 type ContainerData struct {
 	ID     string
-	Name   string
+	Names    []string
+	Image   string
 	State  string
 	Status string
 }
@@ -32,6 +33,8 @@ func main() {
 	http.HandleFunc("/stop", actionHandler)
 	http.HandleFunc("/start", actionHandler)
 	http.HandleFunc("/rm", actionHandler)
+	http.Handle("/tmpfiles/",
+    http.StripPrefix("/tmpfiles/", http.FileServer(http.Dir("/opt/app"))))
 
 	// start up
 	log.Println("Starting on :8089")
@@ -82,11 +85,13 @@ func tmplServer(w http.ResponseWriter, r *http.Request) {
 	var runningContainers, stoppedContainers []ContainerData
 
 	for _, container := range containers {
-		fmt.Printf("%s %s %s\n", container.ID[:10], container.Image, container.Status)
+		fmt.Printf("%s %s %s %s\n", container.ID[:10], container.Names[0], container.Image, container.Status)
 		if len(container.Image) > 33 {
 			container.Image = container.Image[:32]
 		}
-		newContainerData := ContainerData{container.ID[:10], container.Image, container.State, container.Status}
+		name := container.Names[0]
+		container.Names[0] = name[1:]
+		newContainerData := ContainerData{container.ID[:10], container.Names, container.Image, container.State, container.Status}
 
 		switch container.State {
 		case "running":
