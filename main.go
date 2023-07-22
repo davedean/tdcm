@@ -111,8 +111,11 @@ func getContainers() (containers []Container) {
 			State:  containerList[index].State,
 			Status: containerList[index].Status,
 		}
-		if len(containerList[index].Image) > 20 {
-			newContainer.Image = containerList[index].Image[1:16] + "..."
+		if len(containerList[index].Names[0]) > 30 {
+			newContainer.Name = containerList[index].Names[0][1:26] + "..."
+		}
+		if len(containerList[index].Image) > 30 {
+			newContainer.Image = containerList[index].Image[0:24] + "..."
 		}
 
 		if newContainer.State == "running" {
