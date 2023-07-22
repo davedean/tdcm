@@ -110,6 +110,9 @@ func getContainers() (containers []Container) {
 			State:  containerList[index].State,
 			Status: containerList[index].Status,
 		}
+		if containerList[index].Image[1:6] == "sha256" {
+			newContainer.Image = containerList[index].Image[1:16] + "..."
+		}
 		containers = append(containers, newContainer)
 	}
 
