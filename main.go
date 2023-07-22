@@ -52,6 +52,7 @@ func main() {
 	// start up
 	log.Println("Starting on :8089")
 	http.ListenAndServe(":8089", nil)
+}
 	
 func Secret(user, realm string) string {
 	if user == authUser {
