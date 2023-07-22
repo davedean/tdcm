@@ -47,7 +47,7 @@ func (c Container) Action(action string) string {
 		_ = cli.ContainerStop(context.Background(), c.ID, container.StopOptions{})
 	case "start":
 		_ = cli.ContainerStart(context.Background(), c.ID, types.ContainerStartOptions{})
-	case "rm":
+	case "remove":
 		_ = cli.ContainerRemove(context.Background(), c.ID, types.ContainerRemoveOptions{})
 	}
 	return ""
@@ -72,7 +72,7 @@ func main() {
 
 	// Ping test
 	router.GET("/ping", func(c *gin.Context) {
-		c.String(http.StatusOK, "pong")
+		c.String(http.StatusOK, `{ "message": "pong" }`)
 	})
 
 	router.Use(static.Serve("/", static.LocalFile("./assets", true))) // static files, no auth
