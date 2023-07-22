@@ -75,7 +75,7 @@ func main() {
 		c.String(http.StatusOK, "pong")
 	})
 
-	router.Use(static.Serve("/", static.LocalFile("./views", true))) // static files, no auth
+	router.Use(static.Serve("/", static.LocalFile("./assets", true))) // static files, no auth
 
 	// Setup route group for the API
 	api := router.Group("/api")
