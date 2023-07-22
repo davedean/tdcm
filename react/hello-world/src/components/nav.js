@@ -44,11 +44,11 @@ return (
           </li>
         </ul>
       </li>
+      <li>
+          {isAuthenticated && <button className="btn btn-outline-secondary" onClick={onLogout}>Logout</button>}
+          </li>
     </ul>
   </div>
-  <div>
-  {isAuthenticated && <button className="btn btn-outline-secondary" onClick={onLogout}>Logout</button>}
-</div>
 </div>
 </nav>
 )
