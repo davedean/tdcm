@@ -6,7 +6,9 @@ WORKDIR /build
 # easily cached layer first
 COPY react/hello-world/package.json /build/package.json
 COPY react/hello-world/package-lock.json /build/package-lock.json
-COPY react/hello-world/node_modules /build/node_modules
+# the [s] is a hack, so node_modules is only copied if it exists 
+COPY react/hello-world/node_module[s] /build/node_modules
+
 RUN npm install
 
 COPY react/hello-world/public /build/public
