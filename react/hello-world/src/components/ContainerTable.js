@@ -2,6 +2,9 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
+import { ArrowRight, PlayBtn, StopBtn, Trash, Trash2Fill } from 'react-bootstrap-icons';
+
+
 
 const ContainerTable = ({ containers, setContainers }) => {
   const [selectedContainer, setSelectedContainer] = useState(null);
@@ -57,25 +60,23 @@ const ContainerTable = ({ containers, setContainers }) => {
       <table className="table">
         <thead>
           <tr>
-            <th>ID</th>
-            <th>Image</th>
-            <th>State</th>
-            <th>Status</th>
             <th>Actions</th>
+            <th>Name</th>
+            <th>Image</th>
+            <th>Status</th>
           </tr>
         </thead>
         <tbody>
           {containers.map((container) => (
             <tr key={container.id}>
-              <td>{container.id}</td>
-              <td>{container.image}</td>
-              <td>{container.state}</td>
-              <td>{container.status}</td>
               <td>
-                <Button variant="primary" size="sm" disabled={container.state === 'running'} onClick={() => handleStart(container.id)}>Start</Button>{' '}
-                <Button variant="secondary" size="sm" disabled={container.state !== 'running'} onClick={() => handleStop(container.id)}>Stop</Button>{' '}
-                <Button variant="danger" size="sm" disabled={container.state === 'running'} onClick={() => handleShow(container.id)}>Remove</Button>
+                <Button variant="primary" size="sm" disabled={container.state === 'running'} onClick={() => handleStart(container.id)}><PlayBtn /> </Button>{' '}
+                <Button variant="secondary" size="sm" disabled={container.state !== 'running'} onClick={() => handleStop(container.id)}><StopBtn /></Button>{' '}
+                <Button variant="danger" size="sm" disabled={container.state === 'running'} onClick={() => handleShow(container.id)}><Trash2Fill /></Button>
               </td>
+              <td>{container.name}</td>
+              <td>{container.image}</td>
+              <td>{container.status}</td>
             </tr>
           ))}
         </tbody>
