@@ -72,8 +72,8 @@ const ContainerTable = ({ containers, setContainers }) => {
               <td>{container.state}</td>
               <td>{container.status}</td>
               <td>
-                <Button variant="success" size="sm" disabled={container.state === 'running'} onClick={() => handleStart(container.id)}>Start</Button>{' '}
-                <Button variant="warning" size="sm" disabled={container.state !== 'running'} onClick={() => handleStop(container.id)}>Stop</Button>{' '}
+                <Button variant="primary" size="sm" disabled={container.state === 'running'} onClick={() => handleStart(container.id)}>Start</Button>{' '}
+                <Button variant="secondary" size="sm" disabled={container.state !== 'running'} onClick={() => handleStop(container.id)}>Stop</Button>{' '}
                 <Button variant="danger" size="sm" disabled={container.state === 'running'} onClick={() => handleShow(container.id)}>Remove</Button>
               </td>
             </tr>
