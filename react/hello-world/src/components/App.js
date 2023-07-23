@@ -10,6 +10,10 @@ const App = () => {
 
   const [containers, setContainers] = useState([]);
 
+  const savedTheme = localStorage.getItem('theme');
+  if (savedTheme) {
+    document.body.setAttribute('data-bs-theme', savedTheme);
+  }
 
   const handleLogin = (username, password) => {
     axios.defaults.headers.common['Authorization'] = `Basic ${btoa(username + ':' + password)}`;
