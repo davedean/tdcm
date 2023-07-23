@@ -14,6 +14,7 @@ const App = () => {
   const handleLogin = (username, password) => {
     axios.defaults.headers.common['Authorization'] = `Basic ${btoa(username + ':' + password)}`;
     setIsAuthenticated(true);
+    fetchContainers();
   };
 
   const handleLogout = () => {
@@ -50,66 +51,47 @@ const App = () => {
   }, []);
 
 
+  useEffect(() => {
+    const checkAuthentication = async () => {
+      try {
+        // replace /api/protected with the actual endpoint
+        await axios.get('/api/containers');
+        setIsAuthenticated(true);
+      } catch (error) {
+        if (error.response && error.response.status === 403) {
+          setIsAuthenticated(false);
+        }
+      }
+    };
+
+    checkAuthentication();
+  }, []);
+
+
+  const fetchContainers = async () => {
+    try {
+      const result = await axios.get('/api/containers');
+      setContainers(result.data);
+      setIsAuthenticated(true); // This assumes successful fetching of containers means user is authenticated
+    } catch (error) {
+      console.error(error);
+      if (error.response && error.response.status === 403) {
+        setIsAuthenticated(false);
+      }
+    }
+  };
+
+  useEffect(() => {
+    fetchContainers();
+  }, []);
 
   return (
     <div className="App">
         <Nav isAuthenticated={isAuthenticated} onLogout={handleLogout} />
-      {isAuthenticated ? <ContainerTable containers={containers} setContainers={setContainers} /> : <LoginForm onLogin={handleLogin} />}
+      {isAuthenticated ? <ContainerTable containers={containers} setContainers={setContainers} fetchContainers={fetchContainers}  /> : <LoginForm onLogin={handleLogin} onSuccessfulLogin={fetchContainers}  />}
     </div>
   );
   
 };
 
-/*
-
-
-  return (
-    <div className="App">
-      <ContainerTable containers={containers} setContainers={setContainers} />
-    </div>
-  );
-
-
-function AppRender() {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [containers, setContainers] = useState([]);
-
-  const handleLogin = (username, password) => {
-    axios.defaults.headers.common['Authorization'] = `Basic ${btoa(username + ':' + password)}`;
-    setIsAuthenticated(true);
-  };
-
-  const handleLogout = () => {
-    delete axios.defaults.headers.common["Authorization"];
-    setIsAuthenticated(false);
-  };
-
-  useEffect(() => {
-    const interceptor = axios.interceptors.response.use(
-      response => response, 
-      error => {
-        if (error.response.status === 403) {
-          handleLogout();
-        }
-        return Promise.reject(error);
-      }
-    );
-
-    
-    
-    return () => {
-      axios.interceptors.response.eject(interceptor);
-    };
-  }, []);
-
-
-  return (
-    <div className="App">
-        <Nav isAuthenticated={isAuthenticated} onLogout={handleLogout} />
-      {isAuthenticated ? <ContainerTable containers={containers} setContainers={setContainers} /> : <LoginForm onLogin={handleLogin} />}
-    </div>
-  );
-}
-
-*/
 export default App;

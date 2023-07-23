@@ -20,9 +20,14 @@ const (
 	port    = ":8089"
 )
 
+//func isSet(s string) (b bool) {
+//	return s != ""
+//}
+
 // Auth creds
 var authUser string = os.Getenv("USER")
 var authPass string = os.Getenv("PASS")
+var authEnabled bool = authUser != ""
 var secretKey string = "tempsecertstring"
 
 type Container struct {
@@ -58,14 +63,17 @@ func (c Container) Action(action string) string {
 }
 
 func basicAuth(c *gin.Context) {
-	// Get the Basic Authentication credentials
-	user, password, hasAuth := c.Request.BasicAuth()
-	if hasAuth && user == authUser && password == authPass {
-		log.Println("Authenticated user:", user)
-	} else {
-		c.AbortWithStatus(http.StatusForbidden)
-		c.Writer.Header().Set("WWW-Authenticate", "Basic realm=Restricted")
-		return
+	//log.Println("authEnabled:", authEnabled)
+	if authEnabled {
+		// Get the Basic Authentication credentials
+		user, password, hasAuth := c.Request.BasicAuth()
+		if hasAuth && user == authUser && password == authPass {
+			log.Println("Authenticated user:", user)
+		} else {
+			c.AbortWithStatus(http.StatusForbidden)
+			c.Writer.Header().Set("WWW-Authenticate", "Basic realm=Restricted")
+			return
+		}
 	}
 }
 
