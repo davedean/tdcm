@@ -3,13 +3,30 @@ import axios from 'axios';
 import ContainerTable from './ContainerTable';
 import Nav from './nav';
 
-function LoginForm({ onLogin }) {
+function LoginForm({ onLogin, onSuccessfulLogin }) { 
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
 
   const handleSubmit = (e) => {
     e.preventDefault();
     onLogin(username, password);
+
+
+    //event.preventDefault();
+    const authString = `${username}:${password}`;
+
+
+    try {
+      //await 
+      axios.get('/api/containers', {
+        headers: { Authorization: `Basic ${btoa(authString)}` },
+      });
+      onSuccessfulLogin();
+    } catch (error) {
+      console.error(error);
+    }
+
+
   };
 
   return (
