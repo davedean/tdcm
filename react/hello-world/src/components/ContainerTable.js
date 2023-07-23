@@ -9,6 +9,7 @@ import { ArrowRight, PlayBtn, StopBtn, Trash, Trash2Fill } from 'react-bootstrap
 const ContainerTable = ({ containers, setContainers }) => {
   const [selectedContainer, setSelectedContainer] = useState(null);
   const [showModal, setShowModal] = useState(false);
+  const [buttonSize, setButtonSize] = useState('20'); // default size
 
   const handleClose = () => setShowModal(false);
   const handleShow = (containerId) => {
@@ -57,7 +58,7 @@ const ContainerTable = ({ containers, setContainers }) => {
 
   return (
     <div>
-      <table className="table">
+      <table className="table" class="table table-responsive table-striped">
         <thead>
           <tr>
             <th>Start/Stop</th>
@@ -72,10 +73,10 @@ const ContainerTable = ({ containers, setContainers }) => {
             <tr key={container.id}>
               <td>
               { container.state === "running" && (
-                   <Button title="stop" variant="secondary" size="lg" disabled={container.state !== 'running'} onClick={() => handleStop(container.id)}><StopBtn /></Button> 
+                   <Button title="stop" variant="secondary" size="sm" disabled={container.state !== 'running'} onClick={() => handleStop(container.id)}><StopBtn size={buttonSize} /></Button> 
                    ) }
               { container.state !== "running" && (
-                <Button title="start" variant="primary" size="lg" disabled={container.state === 'running'} onClick={() => handleStart(container.id)}><PlayBtn /> </Button>
+                <Button title="start" variant="primary" size="sm" disabled={container.state === 'running'} onClick={() => handleStart(container.id)}><PlayBtn size={buttonSize}/> </Button>
               ) }
               </td>
               <td>{container.name}</td>
@@ -83,7 +84,7 @@ const ContainerTable = ({ containers, setContainers }) => {
               <td>{container.status}</td>
               <td>              
                 { container.state !== "running" && (
-                <Button title="remove" variant="danger" size="lg" disabled={container.state === 'running'} onClick={() => handleShow(container.id)}><Trash2Fill /></Button>
+                <Button title="remove" variant="danger" size="sm" disabled={container.state === 'running'} onClick={() => handleShow(container.id)}><Trash2Fill size={buttonSize}/></Button>
                 ) } 
                 </td>
             </tr>
