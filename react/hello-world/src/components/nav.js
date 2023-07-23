@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import ContainerTable from './containers';
+import ContainerTable from './ContainerTable';
 
 
 

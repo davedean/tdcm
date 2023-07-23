@@ -1,48 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import ContainerTable from './containers';
+import ContainerTable from './ContainerTable';
 import Nav from './nav';
-
-
-function App() {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-
-  const handleLogin = (username, password) => {
-    axios.defaults.headers.common['Authorization'] = `Basic ${btoa(username + ':' + password)}`;
-    setIsAuthenticated(true);
-  };
-
-
-  const handleLogout = () => {
-    delete axios.defaults.headers.common["Authorization"];
-    setIsAuthenticated(false);
-  };
-
-
-  useEffect(() => {
-    const interceptor = axios.interceptors.response.use(
-      response => response, 
-      error => {
-        if (error.response.status === 403) {
-          handleLogout();
-        }
-        return Promise.reject(error);
-      }
-    );
-    
-    return () => {
-      axios.interceptors.response.eject(interceptor);
-    };
-  }, []);
-
-
-  return (
-    <div className="App">
-        <Nav isAuthenticated={isAuthenticated} onLogout={handleLogout} />
-      {isAuthenticated ? <ContainerTable /> : <LoginForm onLogin={handleLogin} />}
-    </div>
-  );
-}
 
 function LoginForm({ onLogin }) {
   const [username, setUsername] = useState('');
@@ -82,4 +41,4 @@ function LoginForm({ onLogin }) {
       );
 }
 
-export default App;
+export default LoginForm;

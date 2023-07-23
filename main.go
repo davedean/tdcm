@@ -5,12 +5,14 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"time"
 
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/client"
 	"github.com/gin-gonic/contrib/static"
 	"github.com/gin-gonic/gin"
+	"github.com/golang-jwt/jwt"
 )
 
 const (
@@ -21,6 +23,7 @@ const (
 // Auth creds
 var authUser string = os.Getenv("USER")
 var authPass string = os.Getenv("PASS")
+var secretKey string = "tempsecertstring"
 
 type Container struct {
 	ID     string `json:"id"`
@@ -66,10 +69,50 @@ func basicAuth(c *gin.Context) {
 	}
 }
 
+func jwtLogin(c *gin.Context) {
+	// Attempt to bind JSON from the request to a struct
+	var loginInfo struct {
+		Username string `json:"username"`
+		Password string `json:"password"`
+	}
+
+	if err := c.BindJSON(&loginInfo); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	// Check if the username and password match
+	if loginInfo.Username != authUser || loginInfo.Password != authPass {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
+		return
+	}
+
+	// The username and password match, so generate and return a JWT
+	token := jwt.New(jwt.SigningMethodHS256)
+
+	// Create a map to store your claims
+	claims := token.Claims.(jwt.MapClaims)
+
+	// Set token claims
+	claims["username"] = authUser
+	claims["exp"] = time.Now().Add(time.Hour * 24).Unix() // Token expires after 24 hours
+
+	// Sign the token with our secret
+	tokenString, _ := token.SignedString(secretKey)
+
+	// Finally, write the token to the browser window
+	c.JSON(http.StatusOK, gin.H{"token": tokenString})
+}
+
 func main() {
 
 	router := gin.Default()
 	router.SetTrustedProxies(nil) // stop gin complaining
+
+	// BEGIN
+	router.POST("/login", jwtLogin)
+
+	// END
 
 	// Ping test
 	router.GET("/ping", func(c *gin.Context) {
