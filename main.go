@@ -31,6 +31,7 @@ type ContainerData struct {
 	Names    []string
 	Image   string
 	State  string
+	Ports []string
 	Status string
 }
 
@@ -114,13 +115,24 @@ func tmplServer(w http.ResponseWriter, r *auth.AuthenticatedRequest) {
 	var runningContainers, stoppedContainers []ContainerData
 
 	for _, container := range containers {
-		fmt.Printf("%s %s %s %s\n", container.ID[:10], container.Names[0], container.Image, container.Status)
+		fmt.Printf("%s %s %s %s %s\n", container.ID[:10], container.Names[0], container.Image, container.Status, container.Ports.PrivatePort)
 		if len(container.Image) > 33 {
 			container.Image = container.Image[:32]
 		}
 		name := container.Names[0]
 		container.Names[0] = name[1:]
-		newContainerData := ContainerData{container.ID[:10], container.Names, container.Image, container.State, container.Status}
+
+		for _, .port := range container.Ports {
+			for _, binding := range port {
+				privatePort := .PrivatePort
+				publicPort := .PublicPort
+
+				// If the public port is not mapped, use the private port as the public port
+				if publicPort == "" {
+				publicPort = privatePort
+				}
+
+		newContainerData := ContainerData{container.ID[:10], container.Names, container.Image, container.State, container.Port, container.Status}
 
 		switch container.State {
 		case "running":

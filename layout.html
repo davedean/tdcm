@@ -69,7 +69,8 @@
                                <th scope="col">Name</th>
                                <th scope="col">Image</th>
                                <th scope="col">State</th>
-                               <th scope="col">Status</th>
+                               <th scope="col">Ports</th>
+                               <th scope="col">Actions</th>
                                <th scope="col"></th>
                                <th scope="col"></th>
                        </tr>
@@ -80,6 +81,7 @@
                                <td>{{.Names}}</td>
                                <td>{{.Image}}</td>
                                <td>{{.Status}}</td>
+                               <td>{{.Ports}}</td>
                                <td><a href="/start?id={{.ID}}" class="btn btn-success">start</a></td>
                                <td><a href="/stop?id={{.ID}}" class="btn btn-primary">stop</a></td>
                                <td><a href="/rm?id={{.ID}}" class="btn btn-danger">rm</a></td>
