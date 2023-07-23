@@ -9,5 +9,6 @@ services:
       - 8089:8089
     environment:
       - DOCKER_API_VERSION=1.39
-      - USER=admin
-      - PASS=admin
+        # if you set USER and PASS, authentication will be enabled
+        #- USER=admin
+        #- PASS=admin
