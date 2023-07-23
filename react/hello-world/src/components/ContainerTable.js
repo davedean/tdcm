@@ -60,23 +60,32 @@ const ContainerTable = ({ containers, setContainers }) => {
       <table className="table">
         <thead>
           <tr>
-            <th>Actions</th>
+            <th>Start/Stop</th>
             <th>Name</th>
             <th>Image</th>
             <th>Status</th>
+            <th>Remove</th>
           </tr>
         </thead>
         <tbody>
           {containers.map((container) => (
             <tr key={container.id}>
               <td>
-                <Button variant="primary" size="sm" disabled={container.state === 'running'} onClick={() => handleStart(container.id)}><PlayBtn /> </Button>{' '}
-                <Button variant="secondary" size="sm" disabled={container.state !== 'running'} onClick={() => handleStop(container.id)}><StopBtn /></Button>{' '}
-                <Button variant="danger" size="sm" disabled={container.state === 'running'} onClick={() => handleShow(container.id)}><Trash2Fill /></Button>
+              { container.state === "running" && (
+                   <Button title="stop" variant="secondary" size="lg" disabled={container.state !== 'running'} onClick={() => handleStop(container.id)}><StopBtn /></Button> 
+                   ) }
+              { container.state !== "running" && (
+                <Button title="start" variant="primary" size="lg" disabled={container.state === 'running'} onClick={() => handleStart(container.id)}><PlayBtn /> </Button>
+              ) }
               </td>
               <td>{container.name}</td>
               <td>{container.image}</td>
               <td>{container.status}</td>
+              <td>              
+                { container.state !== "running" && (
+                <Button title="remove" variant="danger" size="lg" disabled={container.state === 'running'} onClick={() => handleShow(container.id)}><Trash2Fill /></Button>
+                ) } 
+                </td>
             </tr>
           ))}
         </tbody>
