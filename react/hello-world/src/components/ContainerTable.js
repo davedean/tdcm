@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
-import { EjectFill, PlayFill, StopFill   } from 'react-bootstrap-icons';
+import { EjectFill, PlayFill, StopFill, Trash2Fill   } from 'react-bootstrap-icons';
 
 
 
@@ -109,7 +109,7 @@ const ContainerTable = ({ containers, setContainers }) => {
               <td>{container.status}</td>
               <td>              
                 { container.state !== "running" && (
-                <Button title="remove" variant="danger" size="sm" disabled={container.state === 'running'} onClick={() => handleShow(container.id)}><EjectFill size={buttonSize}/></Button>
+                <Button title="remove" variant="danger" size="sm" disabled={container.state === 'running'} onClick={() => handleShow(container.id)}><Trash2Fill size={buttonSize}/></Button>
                 ) } 
                 </td>
             </tr>
