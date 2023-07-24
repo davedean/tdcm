@@ -34,7 +34,7 @@ type Container struct {
 	ID     string `json:"id"`
 	Name   string `json:"name"`
 	Image  string `json:"image"`
-	Ports   uint16 `json:"ports"`
+	Ports  uint16 `json:"ports"`
 	State  string `json:"state"`
 	Status string `json:"status"`
 }
@@ -160,9 +160,11 @@ func getContainers() (containers []Container) {
 			ID:     containerList[index].ID,
 			Name:   containerList[index].Names[0][1:],
 			Image:  containerList[index].Image,
-			Ports:   containerList[index].Ports[0].PublicPort,
 			State:  containerList[index].State,
 			Status: containerList[index].Status,
+		}
+		if len(containerList[index].Ports) > 0 {
+			newContainer.Ports = containerList[index].Ports[0].PublicPort
 		}
 		if len(containerList[index].Names[0]) > 30 {
 			newContainer.Name = containerList[index].Names[0][1:26] + "..."
