@@ -95,13 +95,16 @@ const ContainerTable = ({ containers, setContainers }) => {
               ) }
               </td>
               <td class="text-decoration-underline" onClick={() => openDetailModal(container)}>{container.name}</td>
-              <td>{container.image}</td>
+              <td>{container.image.substring(0,26)}</td>
               <td>  
-                { container.ports !== 0 ? (
-                <a href={`http://${window.location.hostname}:${container.ports}`} target="_blank" rel="noopener noreferrer">
-                {container.ports}
-                </a> )
-                : null }
+                {container.ports && container.ports.length > 0 && container.ports.map((port, index) =>
+                  port !== 0 
+                    ? <span key={index}>
+                      <a href={`http://${window.location.hostname}:${port}`} target="_blank" rel="noopener noreferrer">
+                        {port}
+                      </a>{index < container.ports.length - 1 ? ', ' : ''}
+                      </span> 
+                    : null )}
                 </td>
               <td>{container.status}</td>
               <td>              
@@ -124,7 +127,16 @@ const ContainerTable = ({ containers, setContainers }) => {
         <p>Name: {currentContainer.name}</p>
         <p>Id: {currentContainer.id.substring(0,16) }</p>
         <p>Image: {currentContainer.image}</p>
-        <p>Image: {currentContainer.ports}</p>
+        <p>Ports: 
+        {currentContainer.ports && currentContainer.ports.length > 0 && currentContainer.ports.map((port, index) =>
+                  port !== 0 
+                    ? <span key={index}>
+                      <a href={`http://${window.location.hostname}:${port}`} target="_blank" rel="noopener noreferrer">
+                        {port}
+                      </a>{index < currentContainer.ports.length - 1 ? ', ' : ''}
+                      </span> 
+                    : null )}
+        </p>
         <p>State: {currentContainer.state}</p>
         <p>Status: {currentContainer.status}</p>
         {/* Add any other details you want to display */}
