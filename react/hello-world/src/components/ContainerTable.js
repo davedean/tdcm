@@ -64,6 +64,7 @@ const ContainerTable = ({ containers, setContainers }) => {
             <th>Start/Stop</th>
             <th>Name</th>
             <th>Image</th>
+            <th>Port</th>
             <th>Status</th>
             <th>Remove</th>
           </tr>
@@ -81,6 +82,7 @@ const ContainerTable = ({ containers, setContainers }) => {
               </td>
               <td>{container.name}</td>
               <td>{container.image}</td>
+              <td>{container.ports}</td>
               <td>{container.status}</td>
               <td>              
                 { container.state !== "running" && (
