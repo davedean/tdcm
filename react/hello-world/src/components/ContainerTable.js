@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
-import { ArrowRight, PlayBtn, StopBtn, Trash, Trash2Fill } from 'react-bootstrap-icons';
+import { EjectFill, PlayFill, StopFill   } from 'react-bootstrap-icons';
 
 
 
@@ -88,10 +88,10 @@ const ContainerTable = ({ containers, setContainers }) => {
             <tr key={container.id}>
               <td>
               { container.state === "running" && (
-                   <Button title="stop" variant="secondary" size="sm" disabled={container.state !== 'running'} onClick={() => handleStop(container.id)}><StopBtn size={buttonSize} /></Button> 
+                   <Button title="stop" variant="secondary" size="sm" disabled={container.state !== 'running'} onClick={() => handleStop(container.id)}><StopFill size={buttonSize} /></Button> 
                    ) }
               { container.state !== "running" && (
-                <Button title="start" variant="primary" size="sm" disabled={container.state === 'running'} onClick={() => handleStart(container.id)}><PlayBtn size={buttonSize}/> </Button>
+                <Button title="start" variant="primary" size="sm" disabled={container.state === 'running'} onClick={() => handleStart(container.id)}><PlayFill size={buttonSize}/> </Button>
               ) }
               </td>
               <td class="text-decoration-underline" onClick={() => openDetailModal(container)}>{container.name}</td>
@@ -109,7 +109,7 @@ const ContainerTable = ({ containers, setContainers }) => {
               <td>{container.status}</td>
               <td>              
                 { container.state !== "running" && (
-                <Button title="remove" variant="danger" size="sm" disabled={container.state === 'running'} onClick={() => handleShow(container.id)}><Trash2Fill size={buttonSize}/></Button>
+                <Button title="remove" variant="danger" size="sm" disabled={container.state === 'running'} onClick={() => handleShow(container.id)}><EjectFill size={buttonSize}/></Button>
                 ) } 
                 </td>
             </tr>
