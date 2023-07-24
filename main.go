@@ -136,6 +136,7 @@ func main() {
 		api.GET("/", basicAuth) // basicAuth for api calls
 	}
 	api.GET("/containers", basicAuth, ContainerHandler)
+	api.GET("/containers/detail/:containerID", basicAuth, DetailHandler)
 	api.POST("/containers/:action/:containerID", basicAuth, ActionContainer)
 
 	// Start and run the server
@@ -197,6 +198,39 @@ func ContainerHandler(c *gin.Context) {
 
 	c.Header("Content-Type", "application/json")
 	c.JSON(http.StatusOK, containers)
+}
+
+func DetailHandler(c *gin.Context) {
+	cli, err := client.NewClientWithOpts(client.FromEnv)
+	if err != nil {
+		panic(err)
+	}
+
+	containerid := c.Param("containerID")
+	containeridLength := len(containerid)
+	//action := c.Param("action")
+
+	containers := getContainers()
+
+	match := false
+	var result types.ContainerJSON
+	for i := 0; i < len(containers); i++ {
+		if containers[i].ID[:containeridLength] == containerid {
+			result, err = cli.ContainerInspect(context.Background(), containerid)
+			if err != nil {
+				panic(err)
+			}
+			match = true
+		}
+	}
+
+	if match {
+		c.Header("Content-Type", "application/json")
+		c.JSON(http.StatusOK, result)
+	} else {
+		// this only happens if theres no match
+		c.AbortWithStatus(http.StatusNotFound)
+	}
 }
 
 func ActionContainer(c *gin.Context) {
