@@ -96,7 +96,13 @@ const ContainerTable = ({ containers, setContainers }) => {
               </td>
               <td class="text-decoration-underline" onClick={() => openDetailModal(container)}>{container.name}</td>
               <td>{container.image}</td>
-              <td>{container.ports}</td>
+              <td>  
+                { container.ports !== 0 ? (
+                <a href={`http://${window.location.hostname}:${container.ports}`} target="_blank" rel="noopener noreferrer">
+                {container.ports}
+                </a> )
+                : null }
+                </td>
               <td>{container.status}</td>
               <td>              
                 { container.state !== "running" && (
