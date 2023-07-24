@@ -14,7 +14,7 @@ const ContainerTable = ({ containers, setContainers }) => {
   const [showDetailModal, setShowDetailModal] = useState(false);
   const [currentContainer, setCurrentContainer] = useState(null);
 
-  const [sortField, setSortField] = useState(null);
+  const [sortField, setSortField] = useState("state");
   const [sortDirection, setSortDirection] = useState('asc');
   const [filterQuery, setFilterQuery] = useState('');
 
