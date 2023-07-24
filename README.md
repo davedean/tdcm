@@ -1,6 +1,9 @@
 # tdcm
 Tiny Docker Container Manager - manage containers easily, on most devices.
 
+<img width="838" alt="image" src="https://github.com/davedean/tdcm/assets/2696454/d7b2d58a-7a98-4362-91d0-78bd4024a3cd">
+
+
 ## why
 Checking container status on phones sucks. 
 
