@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
-import { EjectFill, PlayFill, StopFill, Trash2Fill   } from 'react-bootstrap-icons';
+import { EjectFill, PlayFill, StopFill, Trash2Fill, ArrowDown, ArrowUp   } from 'react-bootstrap-icons';
 
 
 
@@ -14,12 +14,37 @@ const ContainerTable = ({ containers, setContainers }) => {
   const [showDetailModal, setShowDetailModal] = useState(false);
   const [currentContainer, setCurrentContainer] = useState(null);
 
+  const [sortField, setSortField] = useState(null);
+  const [sortDirection, setSortDirection] = useState('asc');
+  const [filterQuery, setFilterQuery] = useState('');
+
 
   const handleClose = () => setShowModal(false);
   const handleShow = (containerId) => {
     setSelectedContainer(containerId);
     setShowModal(true);
   };
+
+
+  const sortContainers = (containers) => {
+    return containers.sort((a, b) => {
+      if (a[sortField] < b[sortField]) {
+        return sortDirection === 'asc' ? -1 : 1;
+      }
+      if (a[sortField] > b[sortField]) {
+        return sortDirection === 'asc' ? 1 : -1;
+      }
+      return 0;
+    });
+  };
+  
+
+
+  const filteredContainers = containers.filter(container => 
+    container.name.toLowerCase().includes(filterQuery.toLowerCase())
+  );
+  
+  
 
   const handleStart = async (containerId) => {
     try {
@@ -56,6 +81,13 @@ const ContainerTable = ({ containers, setContainers }) => {
     setShowDetailModal(false);
   };
   
+  const handleSort = (column) => {
+    // If the same column was clicked, change sort direction, otherwise sort ascending
+    const newDirection = sortField === column && sortDirection === 'asc' ? 'desc' : 'asc';
+    setSortField(column);
+    setSortDirection(newDirection);
+  }
+  
 
   const handleRemove = async () => {
     try {
@@ -70,21 +102,32 @@ const ContainerTable = ({ containers, setContainers }) => {
     }
   };
 
+
+let displayedContainers = containers;
+if (sortField !== null) {
+  displayedContainers = sortContainers(displayedContainers);
+}
+
+//displayedContainers = filterContainers(displayedContainers);
+
+
   return (
+
+    
     <div>
       <table className="table" class="table table-responsive table-striped">
         <thead>
           <tr>
-            <th>Start/Stop</th>
-            <th>Name</th>
-            <th>Image</th>
-            <th>Port</th>
-            <th>Status</th>
-            <th>Remove</th>
+            <th onClick={() => handleSort('state')}>Start/Stop {sortField === 'state' ? (sortDirection === 'asc' ? <ArrowDown /> : <ArrowUp />) : ''}</th>
+            <th onClick={() => handleSort('name')}>Name {sortField === 'name' ? (sortDirection === 'asc' ? <ArrowDown /> : <ArrowUp />) : ''}</th>
+            <th onClick={() => handleSort('image')}>Image {sortField === 'image' ? (sortDirection === 'asc' ? <ArrowDown /> : <ArrowUp />) : ''}</th>
+            <th onClick={() => handleSort('ports')}>Ports {sortField === 'ports' ? (sortDirection === 'asc' ? <ArrowDown /> : <ArrowUp />) : ''}</th>
+            <th onClick={() => handleSort('status')}>Status {sortField === 'status' ? (sortDirection === 'asc' ? <ArrowDown /> : <ArrowUp />) : ''}</th>
+            <th onClick={() => handleSort('state')}>Remove {sortField === 'state' ? (sortDirection === 'asc' ? <ArrowDown /> : <ArrowUp />) : ''}</th>
           </tr>
         </thead>
         <tbody>
-          {containers.map((container) => (
+          { filteredContainers.map((container) => (
             <tr key={container.id}>
               <td>
               { container.state === "running" && (
@@ -116,6 +159,15 @@ const ContainerTable = ({ containers, setContainers }) => {
           ))}
         </tbody>
       </table>
+      <div className="d-flex justify-content-center mt-4">
+  <input 
+    type="text"
+    className="form-control w-50"
+    placeholder="Filter containers..."
+    value={filterQuery}
+    onChange={(e) => setFilterQuery(e.target.value)}
+  />
+</div>
 
 <Modal show={showDetailModal} onHide={closeDetailModal}>
   <Modal.Header closeButton>
