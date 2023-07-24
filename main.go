@@ -154,7 +154,6 @@ func getContainers() (containers []Container) {
 		panic(err)
 	}
 
-	var runningContainers, otherContainers []Container
 	for index := range containerList {
 		var newContainer Container = Container{
 			ID:     containerList[index].ID,
@@ -174,12 +173,7 @@ func getContainers() (containers []Container) {
 			newContainer.Name = containerList[index].Names[0][1:26] + "..."
 		}
 
-		if newContainer.State == "running" {
-			runningContainers = append(runningContainers, newContainer)
-		} else {
-			otherContainers = append(otherContainers, newContainer)
-		}
-		containers = append(runningContainers, otherContainers...)
+    containers = append(containers, newContainer)
 	}
 
 	log.Println(containers)
