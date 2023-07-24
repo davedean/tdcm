@@ -31,12 +31,12 @@ var authEnabled bool = authUser != ""
 var secretKey string = "tempsecertstring"
 
 type Container struct {
-	ID     string `json:"id"`
-	Name   string `json:"name"`
-	Image  string `json:"image"`
-	Ports  uint16 `json:"ports"`
-	State  string `json:"state"`
-	Status string `json:"status"`
+	ID     string   `json:"id"`
+	Name   string   `json:"name"`
+	Image  string   `json:"image"`
+	Ports  []uint16 `json:"ports"`
+	State  string   `json:"state"`
+	Status string   `json:"status"`
 }
 
 type PageData struct {
@@ -164,13 +164,13 @@ func getContainers() (containers []Container) {
 			Status: containerList[index].Status,
 		}
 		if len(containerList[index].Ports) > 0 {
-			newContainer.Ports = containerList[index].Ports[0].PublicPort
+			for i := 0; i < len(containerList[index].Ports); i++ {
+				newContainer.Ports = append(newContainer.Ports, containerList[index].Ports[i].PublicPort)
+				log.Println(newContainer.Ports)
+			}
 		}
 		if len(containerList[index].Names[0]) > 30 {
 			newContainer.Name = containerList[index].Names[0][1:26] + "..."
-		}
-		if len(containerList[index].Image) > 30 {
-			newContainer.Image = containerList[index].Image[0:24] + "..."
 		}
 
 		if newContainer.State == "running" {
