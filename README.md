@@ -8,7 +8,8 @@ Checking container status on phones sucks.
 
 Main view:
 
-<img width="789" alt="image" src="https://github.com/davedean/tdcm/assets/2696454/acba60f8-2163-47f0-90c0-a2bef7ed77e4">
+<img width="835" alt="image" src="https://github.com/davedean/tdcm/assets/2696454/a27450ff-fad7-43c7-91b2-c23928905dea">
+
 
 Container details:
 
