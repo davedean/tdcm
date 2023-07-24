@@ -11,6 +11,10 @@ const ContainerTable = ({ containers, setContainers }) => {
   const [showModal, setShowModal] = useState(false);
   const [buttonSize, setButtonSize] = useState('20'); // default size
 
+  const [showDetailModal, setShowDetailModal] = useState(false);
+  const [currentContainer, setCurrentContainer] = useState(null);
+
+
   const handleClose = () => setShowModal(false);
   const handleShow = (containerId) => {
     setSelectedContainer(containerId);
@@ -42,6 +46,16 @@ const ContainerTable = ({ containers, setContainers }) => {
       console.error("Error stopping container", error);
     }
   };
+
+  const openDetailModal = (container) => {
+    setCurrentContainer(container);
+    setShowDetailModal(true);
+  };
+  
+  const closeDetailModal = () => {
+    setShowDetailModal(false);
+  };
+  
 
   const handleRemove = async () => {
     try {
@@ -80,7 +94,7 @@ const ContainerTable = ({ containers, setContainers }) => {
                 <Button title="start" variant="primary" size="sm" disabled={container.state === 'running'} onClick={() => handleStart(container.id)}><PlayBtn size={buttonSize}/> </Button>
               ) }
               </td>
-              <td>{container.name}</td>
+              <td class="text-decoration-underline" onClick={() => openDetailModal(container)}>{container.name}</td>
               <td>{container.image}</td>
               <td>{container.ports}</td>
               <td>{container.status}</td>
@@ -93,6 +107,31 @@ const ContainerTable = ({ containers, setContainers }) => {
           ))}
         </tbody>
       </table>
+
+<Modal show={showDetailModal} onHide={closeDetailModal}>
+  <Modal.Header closeButton>
+    <Modal.Title>Container Details</Modal.Title>
+  </Modal.Header>
+  <Modal.Body>
+    {currentContainer && 
+      <div>
+        <p>Name: {currentContainer.name}</p>
+        <p>Id: {currentContainer.id.substring(0,16) }</p>
+        <p>Image: {currentContainer.image}</p>
+        <p>Image: {currentContainer.ports}</p>
+        <p>State: {currentContainer.state}</p>
+        <p>Status: {currentContainer.status}</p>
+        {/* Add any other details you want to display */}
+      </div>
+    }
+  </Modal.Body>
+  <Modal.Footer>
+    <Button variant="secondary" onClick={closeDetailModal}>
+      Close
+    </Button>
+  </Modal.Footer>
+</Modal>
+
 
       <Modal show={showModal} onHide={handleClose}>
         <Modal.Header closeButton>
