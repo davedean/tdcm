@@ -1,101 +1,94 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import ContainerTable from './ContainerTable';
-import Nav from './nav';
-import LoginForm from './LoginForm';
-
+import React, { useState, useEffect } from 'react'
+import axios from 'axios'
+import ContainerTable from './ContainerTable'
+import Nav from './nav'
+import LoginForm from './LoginForm'
 
 const App = () => {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false)
 
-  const [containers, setContainers] = useState([]);
+  const [containers, setContainers] = useState([])
 
-  const savedTheme = localStorage.getItem('theme');
+  const savedTheme = localStorage.getItem('theme')
   if (savedTheme) {
-    document.body.setAttribute('data-bs-theme', savedTheme);
+    document.body.setAttribute('data-bs-theme', savedTheme)
   }
 
   const handleLogin = (username, password) => {
-    axios.defaults.headers.common['Authorization'] = `Basic ${btoa(username + ':' + password)}`;
-    setIsAuthenticated(true);
-    fetchContainers();
-  };
+    axios.defaults.headers.common.Authorization = `Basic ${btoa(username + ':' + password)}`
+    setIsAuthenticated(true)
+    fetchContainers()
+  }
 
   const handleLogout = () => {
-    delete axios.defaults.headers.common["Authorization"];
-    setIsAuthenticated(false);
-  };
-
+    delete axios.defaults.headers.common.Authorization
+    setIsAuthenticated(false)
+  }
 
   useEffect(() => {
     const fetchContainers = async () => {
-      const result = await axios.get('/api/containers');
-      setContainers(result.data);
-    };
+      const result = await axios.get('/api/containers')
+      setContainers(result.data)
+    }
 
-    fetchContainers();
-  }, []);
+    fetchContainers()
+  }, [])
 
   useEffect(() => {
     const interceptor = axios.interceptors.response.use(
-      response => response, 
+      response => response,
       error => {
         if (error.response.status === 403) {
-          handleLogout();
+          handleLogout()
         }
-        return Promise.reject(error);
+        return Promise.reject(error)
       }
-    );
+    )
 
-    
-    
     return () => {
-      axios.interceptors.response.eject(interceptor);
-    };
-  }, []);
-
+      axios.interceptors.response.eject(interceptor)
+    }
+  }, [])
 
   useEffect(() => {
     const checkAuthentication = async () => {
       try {
         // replace /api/protected with the actual endpoint
-        await axios.get('/api/containers');
-        setIsAuthenticated(true);
+        await axios.get('/api/containers')
+        setIsAuthenticated(true)
       } catch (error) {
         if (error.response && error.response.status === 403) {
-          setIsAuthenticated(false);
+          setIsAuthenticated(false)
         }
       }
-    };
+    }
 
-    checkAuthentication();
-  }, []);
-
+    checkAuthentication()
+  }, [])
 
   const fetchContainers = async () => {
     try {
-      const result = await axios.get('/api/containers');
-      setContainers(result.data);
-      setIsAuthenticated(true); // This assumes successful fetching of containers means user is authenticated
+      const result = await axios.get('/api/containers')
+      setContainers(result.data)
+      setIsAuthenticated(true) // This assumes successful fetching of containers means user is authenticated
     } catch (error) {
-      console.error(error);
+      console.error(error)
       if (error.response && error.response.status === 403) {
-        setIsAuthenticated(false);
+        setIsAuthenticated(false)
       }
     }
-  };
+  }
 
   useEffect(() => {
-    fetchContainers();
-  }, []);
+    fetchContainers()
+  }, [])
 
   return (
-    <div className="App">
-        <Nav isAuthenticated={isAuthenticated} onLogout={handleLogout} />
-      {isAuthenticated ? <ContainerTable containers={containers} setContainers={setContainers} fetchContainers={fetchContainers}  /> : <LoginForm onLogin={handleLogin} onSuccessfulLogin={fetchContainers}  />}
+    <div className='App'>
+      <Nav isAuthenticated={isAuthenticated} onLogout={handleLogout} />
+      {isAuthenticated ? <ContainerTable containers={containers} setContainers={setContainers} fetchContainers={fetchContainers} /> : <LoginForm onLogin={handleLogin} onSuccessfulLogin={fetchContainers} />}
     </div>
-  );
-  
-};
+  )
+}
 
-export default App;
+export default App
