@@ -166,8 +166,9 @@ func getContainers() (containers []Container) {
 		if len(containerList[index].Ports) > 0 {
 			for i := 0; i < len(containerList[index].Ports); i++ {
 				newContainer.Ports = append(newContainer.Ports, containerList[index].Ports[i].PublicPort)
-				log.Println(newContainer.Ports)
+				//containerList[index].Ports[i].PublicPort
 			}
+			newContainer.Ports = removeDuplicate((newContainer.Ports))
 		}
 		if len(containerList[index].Names[0]) > 30 {
 			newContainer.Name = containerList[index].Names[0][1:26] + "..."
@@ -183,6 +184,18 @@ func getContainers() (containers []Container) {
 
 	log.Println(containers)
 	return containers
+}
+
+func removeDuplicate(strSlice []uint16) []uint16 {
+	allKeys := make(map[uint16]bool)
+	list := []uint16{}
+	for _, item := range strSlice {
+		if _, value := allKeys[item]; !value {
+			allKeys[item] = true
+			list = append(list, item)
+		}
+	}
+	return list
 }
 
 func ContainerHandler(c *gin.Context) {
